@@ -1,0 +1,38 @@
+.shiny-text {
+  color: var(--shiny-text-color);
+  background: linear-gradient(
+    120deg,
+    var(--shiny-text-color) 40%,
+    var(--shiny-text-shine-color) 50%,
+    var(--shiny-text-color) 60%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  display: inline-block;
+  animation: shine var(--shiny-text-duration) infinite linear;
+  animation-delay: var(--shiny-text-delay);
+}
+
+.shiny-text.disabled {
+  animation: none;
+}
+
+.shiny-text.pause-on-hover:hover {
+  animation-play-state: paused;
+}
+
+@keyframes shine {
+  0% {
+    background-position: calc(100% * var(--shiny-text-dir)) 0;
+  }
+  100% {
+    background-position: calc(-100% * var(--shiny-text-dir)) 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shiny-text {
+    animation: none;
+  }
+}

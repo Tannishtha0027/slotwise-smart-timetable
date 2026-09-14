@@ -1,0 +1,31 @@
+import type { CollegeData } from '../types/api';
+
+export function getSampleCollegeData(): CollegeData {
+  return {
+    time_slots: [
+      { id: "TS1", date: "2026-10-01", start_time: "09:00:00", end_time: "11:00:00", duration_minutes: 120 },
+      { id: "TS2", date: "2026-10-01", start_time: "13:00:00", end_time: "15:00:00", duration_minutes: 120 },
+      { id: "TS3", date: "2026-10-02", start_time: "09:00:00", end_time: "11:00:00", duration_minutes: 120 }
+    ],
+    rooms: [
+      { id: "R101", capacity: 2, building: "Main", available_slots: ["TS1", "TS2", "TS3"] },
+      { id: "R102", capacity: 5, building: "Main", available_slots: ["TS1", "TS2", "TS3"] }
+    ],
+    faculty: [
+      { id: "F1", name: "Prof. Smith", available_slots: ["TS1", "TS2", "TS3"], max_invigilations_per_day: 2 },
+      { id: "F2", name: "Prof. Johnson", available_slots: ["TS1", "TS3"], max_invigilations_per_day: 1 }
+    ],
+    students: [
+      { id: "S1", batch: "CS-2026", enrolled_exams: ["CS101", "MATH201"] },
+      { id: "S2", batch: "CS-2026", enrolled_exams: ["CS101"] },
+      { id: "S3", batch: "CS-2026", enrolled_exams: ["CS101", "CS102"] },
+      { id: "S4", batch: "CS-2026", enrolled_exams: ["CS102", "MATH201"] },
+      { id: "S5", batch: "CS-2026", enrolled_exams: ["CS102"] }
+    ],
+    exams: [
+      { id: "CS101", course_name: "Intro to CS", duration_minutes: 120, enrolled_students: ["S1", "S2", "S3"] },
+      { id: "CS102", course_name: "Data Structures", duration_minutes: 120, enrolled_students: ["S3", "S4", "S5"] },
+      { id: "MATH201", course_name: "Calculus", duration_minutes: 90, enrolled_students: ["S1", "S4"] }
+    ]
+  };
+}

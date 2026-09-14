@@ -1,0 +1,43 @@
+BACKEND CollegeData STRUCTURE:
+- TimeSlot: id (str), date (date), start_time (time), end_time (time), duration_minutes (int)
+- Room: id (str), capacity (int), building (str, optional), available_slots (list of TimeSlot IDs)
+- Faculty: id (str), name (str), available_slots (list of TimeSlot IDs), max_invigilations_per_day (int, optional), total_invigilations_target (int, optional)
+- Student: id (str), batch (str), enrolled_exams (list of Exam IDs)
+- Exam: id (str), course_name (str), duration_minutes (int), enrolled_students (list of Student IDs), required_invigilators (int, default 1)
+
+EXISTING FILE PARSER:
+- yes/no: No
+- location if found: None. A full project search across the frontend and backend confirms no CSV/Excel parsing libraries (like pandas, openpyxl, SheetJS, or papaparse) are currently installed or implemented.
+
+CURRENT UPLOAD FLOW:
+- The selected `File` object is captured and stored in React state (`selectedFile`) inside `CreateTimetable.tsx`.
+- The file is **not** currently parsed.
+- The file's contents are **not** currently sent anywhere.
+- Selecting a file updates the UI to show the filename and changes the data cards to "Ready to parse".
+- However, clicking "Continue" currently ignores the uploaded file and still calls `getSampleCollegeData()` because the parsing and injection logic has not been implemented in `handleProceed`.
+
+REQUIRED UPLOAD FORMAT:
+- **Format:** Multi-sheet Excel workbook (`.xlsx`)
+- **Reasoning:** A single CSV file cannot cleanly represent the five distinct, highly-relational entities (TimeSlots, Rooms, Faculty, Students, Exams) required by the `CollegeData` schema without massive denormalization, redundancy, and risk of data anomalies. A single Excel workbook with dedicated sheets is the simplest, most user-friendly approach for a single-file upload.
+- **Required Sheets & Columns:**
+  1. `TimeSlots`: id, date (YYYY-MM-DD), start_time (HH:MM), end_time (HH:MM), duration_minutes
+  2. `Rooms`: id, capacity, building, available_slots (comma-separated TimeSlot IDs)
+  3. `Faculty`: id, name, max_invigilations_per_day, available_slots (comma-separated TimeSlot IDs)
+  4. `Exams`: id, course_name, duration_minutes, required_invigilators
+  5. `Students`: id, batch, enrolled_exams (comma-separated Exam IDs)
+  *(Note: `enrolled_students` on the Exam model can be reverse-engineered dynamically by the parser based on the Students' `enrolled_exams` column to prevent duplicate entry).*
+
+EXISTING PARSING LIBRARY:
+- None exist in `package.json` or `requirements.txt`.
+
+RECOMMENDED IMPLEMENTATION:
+- **Library:** Install `xlsx` (SheetJS) or `exceljs` on the frontend.
+- **Logic:** Parse the workbook entirely on the frontend inside `CreateTimetable.tsx` (or a dedicated utility like `src/utils/excelParser.ts`).
+- Convert the sheets into the strict TypeScript `CollegeData` interface.
+- Pass the parsed `CollegeData` object to the existing `generateSchedule(parsedData)` API call. 
+- This avoids needing to write backend file-handling/multipart-form endpoints, seamlessly reusing the exact `POST /api/v1/schedule` JSON endpoint we already built.
+
+FILES THAT WOULD NEED TO CHANGE:
+- `frontend/package.json` (to add `xlsx` or `exceljs`)
+- `frontend/src/pages/CreateTimetable.tsx` (to await parsing in `handleProceed` instead of using sample data when `dataSource === 'file'`)
+- `frontend/src/utils/excelParser.ts` (NEW: to house the validation and parsing logic)
